@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         slow.pics BBCode
 // @namespace    https://github.com/neon-ninja/slowpics-bbcode.user.js
-// @version      1.0.1
+// @version      1.0.2
 // @description  List the comparisons in a slow.pics collection and copy them as BBCode ([comparison] block or [img] tags).
 // @license      MIT
 // @match        https://slow.pics/c/*
@@ -111,16 +111,21 @@
   // BBCode
   // ---------------------------------------------------------------------------
 
-  function comparisonBBCode(rows, labels) {
+  function imgTag(img) {
+    return `[img]${img.url}[/img]`;
+  }
+
+  function comparisonBBCode(rows, labels, wrapImages) {
+    const image = wrapImages ? imgTag : (img) => img.url;
     return [
       `[comparison=${labels.join(', ')}]`,
-      ...rows.map((row) => row.map((img) => img.url).join(', ')),
+      ...rows.map((row) => row.map(image).join(', ')),
       '[/comparison]',
     ].join('\n');
   }
 
   function imgBBCode(rows) {
-    return rows.flat().map((img) => `[img]${img.url}[/img]`).join('\n');
+    return rows.flat().map(imgTag).join('\n');
   }
 
   // ---------------------------------------------------------------------------
@@ -172,6 +177,7 @@
     comparisons: new Set(), // indices of selected comparisons
     columns: new Set(), // indices of selected images within each comparison
     format: 'comparison',
+    wrapImages: true, // [img] tags around each URL in a [comparison] block
     stripFrameType: true,
   };
 
@@ -209,7 +215,7 @@
   function renderOutput() {
     const auto = autoLabels();
     ui.labels.placeholder = auto.join(', ');
-    ui.labels.disabled = ui.strip.disabled = state.format !== 'comparison';
+    ui.labels.disabled = ui.strip.disabled = ui.wrap.disabled = state.format !== 'comparison';
 
     const rows = selectedRows().filter((row) => row.length);
     if (!rows.length) {
@@ -220,7 +226,7 @@
     ui.hint.textContent = '';
     const custom = ui.labels.value.trim();
     const labels = custom ? custom.split(',').map((label) => label.trim()) : auto;
-    ui.output.value = state.format === 'img' ? imgBBCode(rows) : comparisonBBCode(rows, labels);
+    ui.output.value = state.format === 'img' ? imgBBCode(rows) : comparisonBBCode(rows, labels, state.wrapImages);
   }
 
   function renderCollection() {
@@ -322,15 +328,18 @@
     ui.comparisonList = el('div', { class: 'spbb-list' });
     ui.columnList = el('div', { class: 'spbb-row' });
     ui.labels = el('input', { type: 'text', class: 'form-control form-control-sm', oninput: renderOutput });
-    ui.strip = el('input', {
-      type: 'checkbox',
-      checked: state.stripFrameType,
-      class: 'form-check-input me-1',
-      onchange: (event) => {
-        state.stripFrameType = event.target.checked;
-        renderOutput();
-      },
-    });
+    const optionCheckbox = (key) =>
+      el('input', {
+        type: 'checkbox',
+        checked: state[key],
+        class: 'form-check-input me-1',
+        onchange: (event) => {
+          state[key] = event.target.checked;
+          renderOutput();
+        },
+      });
+    ui.wrap = optionCheckbox('wrapImages');
+    ui.strip = optionCheckbox('stripFrameType');
     ui.output = el('textarea', { readOnly: true, rows: 7, class: 'form-control', spellcheck: false });
     ui.hint = el('span', { class: 'spbb-muted' });
     ui.copied = el('span', { class: 'text-success' });
@@ -371,8 +380,9 @@
         formatRadio('comparison', '[comparison] block, one comparison per line'),
         formatRadio('img', '[img] tag per image'),
       ),
+      el('div', { class: 'mt-1' }, el('label', {}, ui.wrap, 'Wrap each image in [img] tags')),
       el('div', { class: 'spbb-row mt-2' }, 'Header names:', ui.labels),
-      el('label', { class: 'mt-1' }, ui.strip, 'Remove frame type such as "(B)" from header names'),
+      el('div', { class: 'mt-1' }, el('label', {}, ui.strip, 'Remove frame type such as "(B)" from header names')),
       el('h6', {}, 'BBCode ',
         el('button', { type: 'button', class: 'btn btn-sm btn-success ms-2', onclick: copyOutput }, 'Copy to clipboard'),
         ' ',

@@ -97,7 +97,8 @@ async function openPanel() {
 
 const output = () => page.inputValue('#spbb-panel textarea');
 const labelFor = (text) => page.locator('#spbb-panel label', { hasText: text });
-const urlsOf = (comp) => comp.images.map((img) => `https://i.slow.pics/${img.path}`).join(', ');
+const img = (file) => `[img]https://i.slow.pics/${file}[/img]`;
+const rowOf = (comp) => comp.images.map((image) => img(image.path)).join(', ');
 
 test('adds a BBCode button next to the slider link, with the panel closed', async () => {
   await openPage();
@@ -111,9 +112,10 @@ test('defaults to a [comparison] block with every comparison, one per line', asy
   assert.equal(lines[0], '[comparison=Remux, RandomBytes, W4NK3R]');
   assert.equal(
     lines[1],
-    'https://i.slow.pics/p/Sk1ZW5EQ.webp, https://i.slow.pics/p/pjI8r1C3.webp, https://i.slow.pics/p/OanuEXyE.webp',
+    '[img]https://i.slow.pics/p/Sk1ZW5EQ.webp[/img], [img]https://i.slow.pics/p/pjI8r1C3.webp[/img], ' +
+      '[img]https://i.slow.pics/p/OanuEXyE.webp[/img]',
   );
-  assert.deepEqual(lines.slice(1, -1), FIXTURE_COLLECTION.comparisons.map(urlsOf));
+  assert.deepEqual(lines.slice(1, -1), FIXTURE_COLLECTION.comparisons.map(rowOf));
   assert.equal(lines.at(-1), '[/comparison]');
 });
 
@@ -149,8 +151,8 @@ test('only includes the chosen comparisons and images', async () => {
     await output(),
     [
       '[comparison=Remux, RandomBytes]',
-      `https://i.slow.pics/${second.images[0].path}, https://i.slow.pics/${second.images[1].path}`,
-      `https://i.slow.pics/${third.images[0].path}, https://i.slow.pics/${third.images[1].path}`,
+      `${img(second.images[0].path)}, ${img(second.images[1].path)}`,
+      `${img(third.images[0].path)}, ${img(third.images[1].path)}`,
       '[/comparison]',
     ].join('\n'),
   );
@@ -176,6 +178,21 @@ test('supports [img] tags, custom header names and keeping the frame type', asyn
   assert.match(await output(), /^\[comparison=BD, Encode, Other\]\n/);
 });
 
+test('can leave the URLs in a [comparison] block unwrapped', async () => {
+  await openPanel();
+  await labelFor('Wrap each image in [img] tags').locator('input').uncheck();
+  const lines = (await output()).split('\n');
+  assert.equal(lines[0], '[comparison=Remux, RandomBytes, W4NK3R]');
+  assert.deepEqual(
+    lines.slice(1, -1),
+    FIXTURE_COLLECTION.comparisons.map((comp) => comp.images.map((image) => `https://i.slow.pics/${image.path}`).join(', ')),
+  );
+
+  await labelFor('[img] tag per image').locator('input').check();
+  assert.equal(await labelFor('Wrap each image in [img] tags').locator('input').isDisabled(), true);
+  assert.equal((await output()).split('\n')[0], '[img]https://i.slow.pics/p/Sk1ZW5EQ.webp[/img]');
+});
+
 test('loads another collection from its URL or key', async () => {
   await openPanel();
   await page.fill('#spbb-panel input[type=text] >> nth=0', 'https://slow.pics/c/OtherKey1');
@@ -187,8 +204,8 @@ test('loads another collection from its URL or key', async () => {
     await output(),
     [
       '[comparison=Source, <img src=x onerror="window.pwned=1">]',
-      'https://i.slow.pics/UTc3iAI1.png, https://i.slow.pics/OaZd0ndk.png',
-      'https://i.slow.pics/EbVure2F.png, https://i.slow.pics/MuGsudEN.png',
+      '[img]https://i.slow.pics/UTc3iAI1.png[/img], [img]https://i.slow.pics/OaZd0ndk.png[/img]',
+      '[img]https://i.slow.pics/EbVure2F.png[/img], [img]https://i.slow.pics/MuGsudEN.png[/img]',
       '[/comparison]',
     ].join('\n'),
   );

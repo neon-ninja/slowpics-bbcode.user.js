@@ -6,8 +6,8 @@ Violentmonkey and Greasemonkey.
 
 ```
 [comparison=Remux, RandomBytes]
-https://i.slow.pics/p/Sk1ZW5EQ.webp, https://i.slow.pics/p/pjI8r1C3.webp
-https://i.slow.pics/p/JOLqfSor.webp, https://i.slow.pics/p/Iz917EAi.webp
+[img]https://i.slow.pics/p/Sk1ZW5EQ.webp[/img], [img]https://i.slow.pics/p/pjI8r1C3.webp[/img]
+[img]https://i.slow.pics/p/JOLqfSor.webp[/img], [img]https://i.slow.pics/p/Iz917EAi.webp[/img]
 [/comparison]
 ```
 
@@ -35,7 +35,9 @@ parts:
 - **Images in each comparison** lists the sources, such as `Remux` and `Encode`. Untick a source
   to leave it out, for example to get two images per line from a three-way comparison.
 - **Format** offers two styles:
-  - a `[comparison=...]` block, with one comparison per line and its images separated by commas;
+  - a `[comparison=...]` block, with one comparison per line and its images separated by commas.
+    Each image is wrapped in an `[img]` tag; untick **Wrap each image in [img] tags** for bare
+    URLs instead;
   - one `[img]...[/img]` tag per image, like slow.pics shows after uploading an image collection.
 - **Header names** sets the names in `[comparison=...]`. By default these are the image names,
   without the frame type that vs-preview adds, such as `(B)`. Untick the checkbox below to keep
