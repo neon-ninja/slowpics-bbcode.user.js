@@ -1,104 +1,66 @@
-# slow.pics CLI
+# slow.pics BBCode
 
-A small command-line tool for working with [slow.pics](https://slow.pics) collections. It lists the
-comparisons in a collection and prints them as BBCode ready to paste into a forum post. It has no
-dependencies beyond the Python standard library (3.9+).
+A userscript for [slow.pics](https://slow.pics) that lists the comparisons in a collection and
+exports them as BBCode, ready to paste into a forum post. It works in Tampermonkey,
+Violentmonkey and Greasemonkey.
 
-## Install
-
-```bash
-pip install git+https://github.com/neon-ninja/slow.pics.CLI
 ```
-
-or, from a checkout, `pip install .` (or `pipx install .`). This installs a `slowpics` command;
-`python -m slowpics_cli` works too.
-
-## Usage
-
-Every command takes the collection either as its full URL or just its key, so these are equivalent:
-
-```bash
-slowpics bbcode https://slow.pics/c/xnkAHiN5
-slowpics bbcode xnkAHiN5
-```
-
-### List the comparisons in a collection
-
-```console
-$ slowpics list xnkAHiN5
-Source vs Encode
-https://slow.pics/c/xnkAHiN5 (comparison: 2 comparisons, 2 sources, 4 images)
-
-[1] Frame 1000
-    1. Source  https://i.slow.pics/UTc3iAI1.png
-    2. Encode  https://i.slow.pics/OaZd0ndk.png
-
-[2] Frame 2000
-    1. Source  https://i.slow.pics/EbVure2F.png
-    2. Encode  https://i.slow.pics/MuGsudEN.png
-```
-
-The numbers in brackets are the comparison numbers, and the numbers beneath them are the source
-numbers. Both can be used to choose what `slowpics bbcode` prints.
-
-### Print BBCode
-
-For a comparison, you get a `[comparison=...]` block with one comparison per line and one image per
-source on each line:
-
-```console
-$ slowpics bbcode https://slow.pics/c/xnkAHiN5
-[comparison=Source, Encode]
-https://i.slow.pics/UTc3iAI1.png, https://i.slow.pics/OaZd0ndk.png
-https://i.slow.pics/EbVure2F.png, https://i.slow.pics/MuGsudEN.png
+[comparison=Remux, RandomBytes]
+https://i.slow.pics/p/Sk1ZW5EQ.webp, https://i.slow.pics/p/pjI8r1C3.webp
+https://i.slow.pics/p/JOLqfSor.webp, https://i.slow.pics/p/Iz917EAi.webp
 [/comparison]
 ```
 
-For a plain image collection, you get one `[img]` tag per image, like slow.pics shows after
-uploading a collection:
+## Install
 
-```console
-$ slowpics bbcode abcd1234
-[img]https://i.slow.pics/lvptnOTb.png[/img]
-[img]https://i.slow.pics/Qw3rTy12.png[/img]
-```
+1. Install a userscript manager such as [Tampermonkey](https://www.tampermonkey.net/),
+   [Violentmonkey](https://violentmonkey.github.io/) or
+   [Greasemonkey](https://www.greasespot.net/).
+2. Open
+   [slowpics-bbcode.user.js](https://raw.githubusercontent.com/neon-ninja/slow.pics.CLI/main/slowpics-bbcode.user.js).
+   Your userscript manager will offer to install it, and it will pick up updates from the same
+   address.
 
-#### Options
+## Usage
 
-| Option | Effect |
-| --- | --- |
-| `-c`, `--comparison SELECTOR` | Include only this comparison. It takes a name, a number from `slowpics list`, or a range such as `2-5`, and can be repeated. Names take precedence over numbers. |
-| `-s`, `--source SELECTOR` | Include only this source from each comparison, by name or number. Repeat it to pick several, in the order they should appear. |
-| `-f`, `--format {auto,comparison,img}` | Choose the output style. `auto`, the default, picks based on whether the collection was uploaded as a comparison. |
-| `-l`, `--labels NAMES` | Set the comma-separated names for the `[comparison=...]` header. By default these are the image names from the first comparison. |
-| `--timeout SECONDS` | Set the network timeout (global, so it goes before the command). |
+Open any comparison on slow.pics (a `https://slow.pics/c/...` page). Then click **BBCode** in the
+bar at the bottom of the page, next to **Slider comparison**. A panel opens with the following
+parts:
 
-Examples:
+- **Collection** shows which collection you're working with. It starts as the one you're
+  viewing. To export a different one, paste its full URL (`https://slow.pics/c/xnkAHiN5`) or just
+  its key (`xnkAHiN5`) and press **Load** or Enter.
+- **Comparisons** lists every comparison in the collection, numbered, each with a ↗ link to open
+  it. Untick the ones you don't want, or use **All** and **None**.
+- **Images in each comparison** lists the sources, such as `Remux` and `Encode`. Untick a source
+  to leave it out, for example to get two images per line from a three-way comparison.
+- **Format** offers two styles:
+  - a `[comparison=...]` block, with one comparison per line and its images separated by commas;
+  - one `[img]...[/img]` tag per image, like slow.pics shows after uploading an image collection.
+- **Header names** sets the names in `[comparison=...]`. By default these are the image names,
+  without the frame type that vs-preview adds, such as `(B)`. Untick the checkbox below to keep
+  the frame type, or type your own names separated by commas.
+- **Copy to clipboard** copies the BBCode, which is also shown in the box below.
 
-```bash
-# Only comparisons 1 to 3 and 7, with Encode listed before Source
-slowpics bbcode xnkAHiN5 -c 1-3 -c 7 -s Encode -s Source
-
-# Rename the header
-slowpics bbcode xnkAHiN5 --labels "BD, Encode"
-
-# Every image as an [img] tag, even for a comparison
-slowpics bbcode xnkAHiN5 --format img
-
-# Copy straight to the clipboard (Linux / macOS)
-slowpics bbcode xnkAHiN5 | xclip -selection clipboard
-slowpics bbcode xnkAHiN5 | pbcopy
-```
+Typing inside the panel doesn't trigger slow.pics' keyboard shortcuts, and Escape closes the panel.
 
 ## How it works
 
-The tool reads the collection's JSON from `https://slow.pics/api/comparison/<key>` and builds image
-links as `https://i.slow.pics/<publicFileName>`. Requests identify themselves with a
-`slowpics-cli/<version>` User-Agent.
+Every slow.pics comparison page includes the whole collection as data: its comparisons, and the
+name and file of every image. The script reads that data, so it needs no API and makes no extra
+requests for the collection you're viewing. Image links are built the same way the page builds
+them: `https://i.slow.pics/` followed by the image's path.
+
+Loading another collection fetches that collection's page from your browser, the same as opening
+it in a tab. This means Cloudflare treats it like normal browsing.
 
 ## Development
 
+The tests serve a saved slow.pics page (`test/fixtures/comparison.html`) locally, inject the
+userscript into it, and drive it in headless Chromium with Playwright.
+
 ```bash
-pip install -e ".[test]"
-pytest
+npm ci
+npx playwright install chromium
+npm test
 ```

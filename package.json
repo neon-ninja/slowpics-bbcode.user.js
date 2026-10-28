@@ -1,0 +1,14 @@
+{
+  "name": "slowpics-bbcode",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Userscript that lists the comparisons in a slow.pics collection and exports them as BBCode",
+  "license": "MIT",
+  "repository": "github:neon-ninja/slow.pics.CLI",
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
