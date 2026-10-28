@@ -17,7 +17,7 @@ https://i.slow.pics/p/JOLqfSor.webp, https://i.slow.pics/p/Iz917EAi.webp
    [Violentmonkey](https://violentmonkey.github.io/) or
    [Greasemonkey](https://www.greasespot.net/).
 2. Open
-   [slowpics-bbcode.user.js](https://raw.githubusercontent.com/neon-ninja/slow.pics.CLI/main/slowpics-bbcode.user.js).
+   [slowpics-bbcode.user.js](https://raw.githubusercontent.com/neon-ninja/slowpics-bbcode.user.js/main/slowpics-bbcode.user.js).
    Your userscript manager will offer to install it, and it will pick up updates from the same
    address.
 

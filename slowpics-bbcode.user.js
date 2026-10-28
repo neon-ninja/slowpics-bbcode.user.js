@@ -1,17 +1,17 @@
 // ==UserScript==
 // @name         slow.pics BBCode
-// @namespace    https://github.com/neon-ninja/slow.pics.CLI
-// @version      1.0.0
+// @namespace    https://github.com/neon-ninja/slowpics-bbcode.user.js
+// @version      1.0.1
 // @description  List the comparisons in a slow.pics collection and copy them as BBCode ([comparison] block or [img] tags).
 // @license      MIT
 // @match        https://slow.pics/c/*
 // @icon         https://slow.pics/favicon-32x32.png
 // @grant        none
 // @run-at       document-idle
-// @homepageURL  https://github.com/neon-ninja/slow.pics.CLI
-// @supportURL   https://github.com/neon-ninja/slow.pics.CLI/issues
-// @downloadURL  https://raw.githubusercontent.com/neon-ninja/slow.pics.CLI/main/slowpics-bbcode.user.js
-// @updateURL    https://raw.githubusercontent.com/neon-ninja/slow.pics.CLI/main/slowpics-bbcode.user.js
+// @homepageURL  https://github.com/neon-ninja/slowpics-bbcode.user.js
+// @supportURL   https://github.com/neon-ninja/slowpics-bbcode.user.js/issues
+// @downloadURL  https://raw.githubusercontent.com/neon-ninja/slowpics-bbcode.user.js/main/slowpics-bbcode.user.js
+// @updateURL    https://raw.githubusercontent.com/neon-ninja/slowpics-bbcode.user.js/main/slowpics-bbcode.user.js
 // ==/UserScript==
 
 (function () {
