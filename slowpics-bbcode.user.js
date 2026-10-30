@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         slow.pics BBCode
 // @namespace    https://github.com/neon-ninja/slowpics-bbcode.user.js
-// @version      1.0.2
+// @version      1.0.3
 // @description  List the comparisons in a slow.pics collection and copy them as BBCode ([comparison] block or [img] tags).
 // @license      MIT
 // @match        https://slow.pics/c/*
@@ -83,7 +83,7 @@
         name: comp.name || '',
         images: (comp.images || []).map((img) => ({
           name: img.name || '',
-          url: cdnUrl + (img.path || img.publicFileName),
+          url: cdnUrl + (img.publicFileName || img.path),
         })),
       })),
     };

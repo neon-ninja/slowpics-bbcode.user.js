@@ -18,8 +18,8 @@ const OTHER_COLLECTION = {
       key: 'CmpOne01',
       name: 'Frame 100',
       images: [
-        { name: '(I) Source', publicFileName: 'UTc3iAI1.png', path: 'UTc3iAI1.png' },
-        { name: '(I) <img src=x onerror="window.pwned=1">', publicFileName: 'OaZd0ndk.png', path: 'OaZd0ndk.png' },
+        { name: '(I) Source', publicFileName: 'UTc3iAI1.png', path: 'p/UTc3iAI1.png' },
+        { name: '(I) <img src=x onerror="window.pwned=1">', publicFileName: 'OaZd0ndk.png', path: 'p/OaZd0ndk.png' },
       ],
     },
     {
@@ -98,7 +98,7 @@ async function openPanel() {
 const output = () => page.inputValue('#spbb-panel textarea');
 const labelFor = (text) => page.locator('#spbb-panel label', { hasText: text });
 const img = (file) => `[img]https://i.slow.pics/${file}[/img]`;
-const rowOf = (comp) => comp.images.map((image) => img(image.path)).join(', ');
+const rowOf = (comp) => comp.images.map((image) => img(image.publicFileName)).join(', ');
 
 test('adds a BBCode button next to the slider link, with the panel closed', async () => {
   await openPage();
@@ -112,8 +112,8 @@ test('defaults to a [comparison] block with every comparison, one per line', asy
   assert.equal(lines[0], '[comparison=Remux, RandomBytes, W4NK3R]');
   assert.equal(
     lines[1],
-    '[img]https://i.slow.pics/p/Sk1ZW5EQ.webp[/img], [img]https://i.slow.pics/p/pjI8r1C3.webp[/img], ' +
-      '[img]https://i.slow.pics/p/OanuEXyE.webp[/img]',
+    '[img]https://i.slow.pics/Sk1ZW5EQ.webp[/img], [img]https://i.slow.pics/pjI8r1C3.webp[/img], ' +
+      '[img]https://i.slow.pics/OanuEXyE.webp[/img]',
   );
   assert.deepEqual(lines.slice(1, -1), FIXTURE_COLLECTION.comparisons.map(rowOf));
   assert.equal(lines.at(-1), '[/comparison]');
@@ -151,8 +151,8 @@ test('only includes the chosen comparisons and images', async () => {
     await output(),
     [
       '[comparison=Remux, RandomBytes]',
-      `${img(second.images[0].path)}, ${img(second.images[1].path)}`,
-      `${img(third.images[0].path)}, ${img(third.images[1].path)}`,
+      `${img(second.images[0].publicFileName)}, ${img(second.images[1].publicFileName)}`,
+      `${img(third.images[0].publicFileName)}, ${img(third.images[1].publicFileName)}`,
       '[/comparison]',
     ].join('\n'),
   );
@@ -166,8 +166,8 @@ test('supports [img] tags, custom header names and keeping the frame type', asyn
   await labelFor('[img] tag per image').locator('input').check();
   const lines = (await output()).split('\n');
   assert.equal(lines.length, 30);
-  assert.equal(lines[0], '[img]https://i.slow.pics/p/Sk1ZW5EQ.webp[/img]');
-  assert.equal(lines[1], '[img]https://i.slow.pics/p/pjI8r1C3.webp[/img]');
+  assert.equal(lines[0], '[img]https://i.slow.pics/Sk1ZW5EQ.webp[/img]');
+  assert.equal(lines[1], '[img]https://i.slow.pics/pjI8r1C3.webp[/img]');
   assert.equal(await page.locator('#spbb-panel input[type=text]').nth(1).isDisabled(), true);
 
   await labelFor('[comparison] block').locator('input').check();
@@ -185,12 +185,12 @@ test('can leave the URLs in a [comparison] block unwrapped', async () => {
   assert.equal(lines[0], '[comparison=Remux, RandomBytes, W4NK3R]');
   assert.deepEqual(
     lines.slice(1, -1),
-    FIXTURE_COLLECTION.comparisons.map((comp) => comp.images.map((image) => `https://i.slow.pics/${image.path}`).join(', ')),
+    FIXTURE_COLLECTION.comparisons.map((comp) => comp.images.map((image) => `https://i.slow.pics/${image.publicFileName}`).join(', ')),
   );
 
   await labelFor('[img] tag per image').locator('input').check();
   assert.equal(await labelFor('Wrap each image in [img] tags').locator('input').isDisabled(), true);
-  assert.equal((await output()).split('\n')[0], '[img]https://i.slow.pics/p/Sk1ZW5EQ.webp[/img]');
+  assert.equal((await output()).split('\n')[0], '[img]https://i.slow.pics/Sk1ZW5EQ.webp[/img]');
 });
 
 test('loads another collection from its URL or key', async () => {

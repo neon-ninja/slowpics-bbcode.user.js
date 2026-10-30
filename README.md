@@ -6,8 +6,8 @@ Violentmonkey and Greasemonkey.
 
 ```
 [comparison=Remux, RandomBytes]
-[img]https://i.slow.pics/p/Sk1ZW5EQ.webp[/img], [img]https://i.slow.pics/p/pjI8r1C3.webp[/img]
-[img]https://i.slow.pics/p/JOLqfSor.webp[/img], [img]https://i.slow.pics/p/Iz917EAi.webp[/img]
+[img]https://i.slow.pics/Sk1ZW5EQ.webp[/img], [img]https://i.slow.pics/pjI8r1C3.webp[/img]
+[img]https://i.slow.pics/JOLqfSor.webp[/img], [img]https://i.slow.pics/Iz917EAi.webp[/img]
 [/comparison]
 ```
 
@@ -50,8 +50,8 @@ Typing inside the panel doesn't trigger slow.pics' keyboard shortcuts, and Escap
 
 Every slow.pics comparison page includes the whole collection as data: its comparisons, and the
 name and file of every image. The script reads that data, so it needs no API and makes no extra
-requests for the collection you're viewing. Image links are built the same way the page builds
-them: `https://i.slow.pics/` followed by the image's path.
+requests for the collection you're viewing. Image links are `https://i.slow.pics/` followed by
+the image's file name, such as `https://i.slow.pics/Sk1ZW5EQ.webp`.
 
 Loading another collection fetches that collection's page from your browser, the same as opening
 it in a tab. This means Cloudflare treats it like normal browsing.
